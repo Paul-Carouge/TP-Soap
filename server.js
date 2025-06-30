@@ -3,12 +3,13 @@ const fs = require("node:fs");
 const http = require("http");
 const postgres = require("postgres");
  
-const sql = postgres({ db: "mydb", user: "user", password: "password" });
+const sql = postgres({ db: "mydb", user: "paul", password: "1805" });
 
 // Définition du service
 const service = {
   ProductsService: {
     ProductsPort: {
+        // Création d'un produit
         CreateProduct: async function ({ name, about, price }, callback) {
             if (!name || !about || !price) {
               throw {
@@ -31,24 +32,30 @@ const service = {
         
             // Retourne le produit créé
             callback(product[0]);
-          },
-    },
-  },
+        },
+
+        // Récupération de tous les produits
+        GetProducts: async function (_, callback) {
+            const products = await sql`
+                SELECT * FROM products
+            `;
+            callback(products);
+        }
+    }
+  }
 };
-
-
 
 // Serveur http pour le test
 const server = http.createServer(function (request, response) {
     response.end("404: Not Found: " + request.url);
-  });
+});
   
-  server.listen(8000);
+server.listen(8000);
   
-  // Création du serveur SOAP
-  const xml = fs.readFileSync("productsService.wsdl", "utf8");
-  soap.listen(server, "/products", service, xml, function () {
+// Création du serveur SOAP
+const xml = fs.readFileSync("productsService.wsdl", "utf8");
+soap.listen(server, "/products", service, xml, function () {
     console.log("SOAP server running at http://localhost:8000/products?wsdl");
-  });  
+});  
 
   

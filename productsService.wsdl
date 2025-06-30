@@ -29,6 +29,30 @@
           </xsd:sequence>
         </xsd:complexType>
       </xsd:element>
+
+    <!-- Récupération d'un produit : requête -->
+      <xsd:element name="GetProductsRequest">
+        <xsd:complexType/>
+      </xsd:element>
+
+    <!-- Récupération d'un produit : réponse -->
+      <xsd:element name="GetProductsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Product" type="tns:Product" maxOccurs="unbounded" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+    <!-- Définition du type Product -->
+      <xsd:complexType name="Product">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" />
+          <xsd:element name="name" type="xsd:string" />
+          <xsd:element name="about" type="xsd:string" />
+          <xsd:element name="price" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
     </xsd:schema>
   </types>
 
@@ -40,15 +64,27 @@
     <part name="response" element="tns:CreateProductResponse"/>
   </message>
 
-  <!-- PortType pour la création d'un produit -->
+  <!-- Message de la récupération d'un produit -->
+  <message name="GetProductsRequestMessage">
+    <part name="request" element="tns:GetProductsRequest"/>
+  </message>
+  <message name="GetProductsResponseMessage">
+    <part name="response" element="tns:GetProductsResponse"/>
+  </message>
+
+  <!-- PortType regroupé -->
   <portType name="ProductsPortType">
     <operation name="CreateProduct">
       <input message="tns:CreateProductRequestMessage"/>
       <output message="tns:CreateProductResponseMessage"/>
     </operation>
+    <operation name="GetProducts">
+      <input message="tns:GetProductsRequestMessage"/>
+      <output message="tns:GetProductsResponseMessage"/>
+    </operation>
   </portType>
 
-  <!-- Binding pour la création d'un produit -->
+  <!-- Binding regroupé -->
   <binding name="ProductsBinding" type="tns:ProductsPortType">
     <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
     <operation name="CreateProduct">
@@ -62,9 +98,20 @@
           encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
       </output>
     </operation>
+    <operation name="GetProducts">
+      <soap:operation soapAction="http://localhost:8000/products/GetProducts"/>
+      <input>
+        <soap:body use="encoded" namespace="http://localhost:8000/products"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="http://localhost:8000/products"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </output>
+    </operation>
   </binding>
 
-  <!-- Service pour la création d'un produit -->
+  <!-- Service regroupé -->
   <service name="ProductsService">
     <port name="ProductsPort" binding="tns:ProductsBinding">
       <soap:address location="http://localhost:8000/products"/>

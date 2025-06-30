@@ -16,6 +16,14 @@ soap.createClient("http://localhost:8000/products?wsdl", {}, function (err, clie
       );
       return;
     }
-    console.log("Result:", result);
+    console.log("ResultAjout:", result);
+  });
+
+  client.GetProducts({}, function (err, result) {
+    if (err) {
+      console.error("Error making SOAP request:", err);
+      return;
+    }
+    console.log("ResultRecup:", result);
   });
 });
