@@ -27,7 +27,7 @@ soap.createClient("http://localhost:8000/products?wsdl", {}, function (err, clie
       console.log("Produit mis à jour:", result);
 
       // Test de suppression du produit
-      client.DeleteProduct({ id: result.id }, function (err, result) {
+      client.DeleteProduct({ id: 3 }, function (err, result) {
         if (err) {
           console.error("Error deleting product:", err);
           return;
