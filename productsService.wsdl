@@ -18,7 +18,7 @@
         </xsd:complexType>
       </xsd:element>
 
-      <!-- Réponse de la création d'un produit -->
+    <!-- Réponse de la création d'un produit -->
       <xsd:element name="CreateProductResponse">
         <xsd:complexType>
           <xsd:sequence>
@@ -32,7 +32,7 @@
     </xsd:schema>
   </types>
 
-   <!-- Message de la création d'un produit -->
+    <!-- Message de la création d'un produit -->
    <message name="CreateProductRequestMessage">
     <part name="request" element="tns:CreateProductRequest"/>
   </message>
