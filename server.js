@@ -40,6 +40,101 @@ const service = {
                 SELECT * FROM products
             `;
             callback(products);
+        },
+
+        // Mise à jour partielle d'un produit
+        PatchProduct: async function ({ id, name, about, price }, callback) {
+            if (!id) {
+                throw {
+                    Fault: {
+                        Code: {
+                            Value: "soap:Sender",
+                            Subcode: { value: "rpc:BadArguments" },
+                        },
+                        Reason: { Text: "ID is required" },
+                        statusCode: 400,
+                    },
+                };
+            }
+
+            // Vérifier si le produit existe
+            const existingProduct = await sql`
+                SELECT * FROM products WHERE id = ${id}
+            `;
+
+            if (existingProduct.length === 0) {
+                throw {
+                    Fault: {
+                        Code: {
+                            Value: "soap:Sender",
+                            Subcode: { value: "rpc:NotFound" },
+                        },
+                        Reason: { Text: "Product not found" },
+                        statusCode: 404,
+                    },
+                };
+            }
+
+            // Préparer les valeurs à mettre à jour
+            const updatedName = name !== undefined ? name : existingProduct[0].name;
+            const updatedAbout = about !== undefined ? about : existingProduct[0].about;
+            const updatedPrice = price !== undefined ? price : existingProduct[0].price;
+
+            // Effectuer la mise à jour
+            const updatedProduct = await sql`
+                UPDATE products 
+                SET name = ${updatedName},
+                    about = ${updatedAbout},
+                    price = ${updatedPrice}
+                WHERE id = ${id}
+                RETURNING *
+            `;
+
+            callback(updatedProduct[0]);
+        },
+
+        // Suppression d'un produit
+        DeleteProduct: async function ({ id }, callback) {
+            if (!id) {
+                throw {
+                    Fault: {
+                        Code: {
+                            Value: "soap:Sender",
+                            Subcode: { value: "rpc:BadArguments" },
+                        },
+                        Reason: { Text: "ID is required" },
+                        statusCode: 400,
+                    },
+                };
+            }
+
+            // Vérifier si le produit existe
+            const existingProduct = await sql`
+                SELECT * FROM products WHERE id = ${id}
+            `;
+
+            if (existingProduct.length === 0) {
+                throw {
+                    Fault: {
+                        Code: {
+                            Value: "soap:Sender",
+                            Subcode: { value: "rpc:NotFound" },
+                        },
+                        Reason: { Text: "Product not found" },
+                        statusCode: 404,
+                    },
+                };
+            }
+
+            // Supprimer le produit
+            await sql`
+                DELETE FROM products WHERE id = ${id}
+            `;
+
+            callback({
+                success: true,
+                message: "Product successfully deleted"
+            });
         }
     }
   }
